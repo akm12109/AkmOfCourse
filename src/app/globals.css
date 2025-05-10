@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    /* New Palette:
+       Green: #008744 (hsl(149, 100%, 26%))
+       Blue: #0057e7 (hsl(217, 100%, 45%))
+       Red: #d62d20 (hsl(4, 70%, 46%))
+       Yellow: #ffa700 (hsl(39, 100%, 50%))
+       White: #ffffff (hsl(0, 0%, 100%))
+    */
+    --background: 0 0% 100%; /* White */
+    --foreground: 224 71.4% 4.1%; /* Keeping a dark color for text for readability */
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+
+    --primary: 217 100% 45%; /* Blue #0057e7 */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    --secondary: 217 100% 95%; /* Lighter Blue */
+    --secondary-foreground: 217 100% 35%; /* Darker Blue for text on light blue */
+
+    --muted: 210 40% 96.1%; /* Light gray */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Medium gray for text on muted */
+
+    --accent: 149 100% 26%; /* Green #008744 */
+    --accent-foreground: 0 0% 100%; /* White for text on accent */
+
+    --destructive: 4 70% 46%; /* Red #d62d20 */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 214.3 31.8% 91.4%; /* Light border */
+    --input: 214.3 31.8% 91.4%; /* Light input background */
+    --ring: 217 100% 55%; /* Ring based on primary */
+
+    --radius: 0.5rem;
+
+    /* Chart colors using the new palette + derivatives */
+    --chart-1: 217 100% 45%; /* Blue */
+    --chart-2: 149 100% 26%; /* Green */
+    --chart-3: 39 100% 50%;  /* Yellow */
+    --chart-4: 4 70% 56%;    /* Lighter Red */
+    --chart-5: 217 80% 65%;  /* Lighter Blue */
+
+    --sidebar-background: 0 0% 98%; /* Slightly off-white for sidebar */
+    --sidebar-foreground: 224 71.4% 4.1%;
+    --sidebar-primary: 217 100% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 149 100% 90%; /* Light Green */
+    --sidebar-accent-foreground: 149 100% 20%; /* Dark Green for text on light green */
+    --sidebar-border: 214.3 31.8% 88.4%;
+    --sidebar-ring: 217 100% 55%;
+  }
+
+  .dark {
+    --background: 222 47% 11%; /* Dark Blue/Gray */
+    --foreground: 210 40% 98%; /* Light Gray/White */
+
+    --card: 222 47% 13%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 13%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 100% 55%; /* Lighter Blue for dark mode */
+    --primary-foreground: 0 0% 100%; 
+
+    --secondary: 217 100% 25%; /* Darker Blue variant */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 149 100% 36%; /* Darker Green for dark mode */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 4 70% 56%; /* Lighter Red for dark mode */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217.2 32.6% 22.5%;
+    --input: 217.2 32.6% 20.5%;
+    --ring: 217 100% 65%;
+    
+    /* Chart colors for dark mode */
+    --chart-1: 217 100% 55%; /* Lighter Blue */
+    --chart-2: 149 100% 36%; /* Darker Green */
+    --chart-3: 39 100% 60%;  /* Lighter Yellow */
+    --chart-4: 4 70% 66%;    /* Lighter Red */
+    --chart-5: 217 80% 75%;  /* Even Lighter Blue */
+
+    --sidebar-background: 222 47% 9%; /* Darker sidebar */
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 100% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 149 100% 20%; /* Dark Green variant */
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 217 100% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    @apply antialiased;
+  }
+}
