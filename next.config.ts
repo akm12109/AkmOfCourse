@@ -31,7 +31,9 @@ const nextConfig: NextConfig = {
     ],
   },
   env: {
+    ADMIN_USERNAME: process.env.ADMIN_USERNAME,
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+    // ADSTERRA_SCRIPT_SRC: process.env.ADSTERRA_SCRIPT_SRC, // Removed Adsterra script source as multiple scripts are added directly
   }
 };
 

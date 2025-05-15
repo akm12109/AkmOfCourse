@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, ListChecks, BarChart2, Settings, Users, MessageSquare, Edit3, Trash2, Palette, Image as ImageIcon, ClipboardList, FileQuestion, Newspaper } from 'lucide-react';
+import { PlusCircle, ListChecks, BarChart2, Settings, Users, MessageSquare, Palette, Image as ImageIcon, ClipboardList, FileQuestion, Newspaper, PenTool, BookOpen, Edit3, TrendingUp } from 'lucide-react'; // Added TrendingUp
 import { getReviewsByCourseId, getCourses, getCourseRequests } from '@/services/courseService'; 
 import { getBlogPosts } from '@/services/blogService';
 import type { Review } from '@/types';
@@ -18,14 +18,19 @@ async function fetchAdminData() {
   try {
     const courses = await getCourses(); 
     const courseRequests = await getCourseRequests();
-    const blogPosts = await getBlogPosts(true); // Include unpublished for admin count
-    let latestReviews: Review[] = [];
+    const allBlogPosts = await getBlogPosts(true); // Include unpublished for admin count
+
+    // Calculate published vs draft blog posts
+    const publishedBlogPostsCount = allBlogPosts.filter(post => post.isPublished).length;
+    const draftBlogPostsCount = allBlogPosts.length - publishedBlogPostsCount;
+
+    // Calculate featured courses
+    const featuredCoursesCount = courses.filter(course => course.isFeatured).length;
 
     // Fetch a few latest overall reviews.
-    const allReviewsSnapshot = await getDocs(firestoreQuery(collection(db, "reviews"), orderBy("createdAt", "desc"), limit(3)));
-    latestReviews = allReviewsSnapshot.docs.map(doc => {
+    const latestReviewsSnapshot = await getDocs(firestoreQuery(collection(db, "reviews"), orderBy("createdAt", "desc"), limit(3)));
+    const latestReviews: Review[] = latestReviewsSnapshot.docs.map(doc => {
         const data = doc.data();
-        // Ensure createdAt is a string or Date for formatDistanceToNow
         const createdAt = data.createdAt instanceof Date ? data.createdAt : 
                           (data.createdAt && data.createdAt.toDate) ? data.createdAt.toDate() : new Date();
         return { 
@@ -35,13 +40,20 @@ async function fetchAdminData() {
             createdAt: createdAt 
         } as Review;
     });
-
+    
+    // Fetch total reviews count
+    const allReviewsCountSnapshot = await getDocs(collection(db, "reviews"));
+    const totalReviews = allReviewsCountSnapshot.size;
 
     return {
       totalCourses: courses.length,
       latestReviews,
       totalCourseRequests: courseRequests.length,
-      totalBlogPosts: blogPosts.length,
+      totalBlogPosts: allBlogPosts.length,
+      publishedBlogPostsCount,
+      draftBlogPostsCount,
+      featuredCoursesCount,
+      totalReviews,
     };
   } catch (error) {
     console.error("Error fetching admin data:", error);
@@ -50,13 +62,26 @@ async function fetchAdminData() {
       latestReviews: [],
       totalCourseRequests: 0,
       totalBlogPosts: 0,
+      publishedBlogPostsCount: 0,
+      draftBlogPostsCount: 0,
+      featuredCoursesCount: 0,
+      totalReviews: 0,
     };
   }
 }
 
 
 export default async function AdminDashboardPage() {
-  const { totalCourses, latestReviews, totalCourseRequests, totalBlogPosts } = await fetchAdminData();
+  const { 
+    totalCourses, 
+    latestReviews, 
+    totalCourseRequests, 
+    totalBlogPosts,
+    publishedBlogPostsCount,
+    draftBlogPostsCount,
+    featuredCoursesCount,
+    totalReviews
+  } = await fetchAdminData();
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
@@ -70,7 +95,7 @@ export default async function AdminDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               Manage Courses ({totalCourses})
-              <ListChecks className="h-6 w-6 text-primary" />
+              <BookOpen className="h-6 w-6 text-primary" />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -141,7 +166,6 @@ export default async function AdminDashboardPage() {
             <Button asChild>
               <Link href="/manage-socials">Manage Social Links</Link>
             </Button>
-            {/* More settings can be added here */}
           </CardContent>
         </Card>
         
@@ -162,6 +186,23 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
 
+        <Card className="shadow-md hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              Content Editor
+              <PenTool className="h-6 w-6 text-primary" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Access integrated editor for live content changes. (Future Feature)
+            </p>
+            <Button asChild>
+              <Link href="/admin/content-editor">Open Editor</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
          <Card className="md:col-span-2 lg:col-span-3 shadow-md hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -171,9 +212,9 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              Basic platform statistics. (Full analytics integration is a larger feature).
+              Key platform statistics.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-center md:text-left">
                 <div className="p-4 bg-secondary/50 rounded-md">
                     <h4 className="text-sm font-medium text-muted-foreground">Total Users</h4>
                     <p className="text-2xl font-bold">N/A</p>
@@ -183,9 +224,46 @@ export default async function AdminDashboardPage() {
                     <h4 className="text-sm font-medium text-muted-foreground">Active Courses</h4>
                     <p className="text-2xl font-bold">{totalCourses}</p>
                 </div>
+                <div className="p-4 bg-secondary/50 rounded-md">
+                    <h4 className="text-sm font-medium text-muted-foreground">Featured Courses</h4>
+                    <p className="text-2xl font-bold">{featuredCoursesCount}</p>
+                </div>
+                <div className="p-4 bg-secondary/50 rounded-md">
+                    <h4 className="text-sm font-medium text-muted-foreground">Published Blogs</h4>
+                    <p className="text-2xl font-bold">{publishedBlogPostsCount}</p>
+                </div>
+                 <div className="p-4 bg-secondary/50 rounded-md">
+                    <h4 className="text-sm font-medium text-muted-foreground">Draft Blogs</h4>
+                    <p className="text-2xl font-bold">{draftBlogPostsCount}</p>
+                </div>
+                 <div className="p-4 bg-secondary/50 rounded-md">
+                    <h4 className="text-sm font-medium text-muted-foreground">Total Reviews</h4>
+                    <p className="text-2xl font-bold">{totalReviews}</p>
+                </div>
             </div>
+             <Button variant="link" asChild className="mt-4">
+                <Link href="/admin/advanced-analytics">View Advanced Analytics (Future)</Link>
+            </Button>
           </CardContent>
         </Card>
+        
+        <Card className="shadow-md hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              Advanced Analytics (Future)
+              <TrendingUp className="h-6 w-6 text-primary" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Deep dive into user behavior, traffic sources, and content performance. (Future Feature)
+            </p>
+            <Button asChild>
+              <Link href="/admin/advanced-analytics">Explore Advanced Analytics</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
 
         {latestReviews.length > 0 && (
             <Card className="md:col-span-2 lg:col-span-3 shadow-md hover:shadow-lg transition-shadow">
@@ -229,7 +307,7 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              User management, detailed analytics, content editor integration, etc.
+              User management and other upcoming enhancements.
             </p>
           </CardContent>
         </Card>

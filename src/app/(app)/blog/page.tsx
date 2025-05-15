@@ -9,6 +9,7 @@ import { ArrowRight, Newspaper } from 'lucide-react';
 import type { BlogPost } from '@/types';
 import { getBlogPosts } from '@/services/blogService'; 
 import { cn } from '@/lib/utils';
+import AdScripts from '@/components/home/AdScripts'; // Import AdScripts
 
 const BlogPostCard: React.FC<{ post: BlogPost }> = ({ post }) => {
   return (
@@ -67,24 +68,30 @@ export default async function BlogPage() {
   const posts: BlogPost[] = await getBlogPosts(); 
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <div className="text-center mb-10 md:mb-12">
-        <Newspaper className="mx-auto h-12 w-12 text-primary mb-4" />
-        <h1 className="text-4xl font-bold tracking-tight">Akm of course Blog</h1>
-        <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Stay updated with the latest news, tutorials, and insights on various technologies and skills.
-        </p>
-      </div>
-
-      {posts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post) => (
-            <BlogPostCard key={post.id} post={post} />
-          ))}
+    <>
+      <AdScripts />
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="text-center mb-10 md:mb-12">
+          <Newspaper className="mx-auto h-12 w-12 text-primary mb-4" />
+          <h1 className="text-4xl font-bold tracking-tight">Akm of course Blog</h1>
+          <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
+            Stay updated with the latest news, tutorials, and insights on various technologies and skills.
+          </p>
         </div>
-      ) : (
-        <p className="text-center text-muted-foreground">No blog posts available yet. Check back soon!</p>
-      )}
-    </div>
+
+        {posts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {posts.map((post) => (
+              <BlogPostCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-muted-foreground">No blog posts available yet. Check back soon!</p>
+        )}
+        
+        {/* Adsterra Container Div */}
+        <div id="container-0d34bfa184002fad5912558643501f63" className="mt-12"></div>
+      </div>
+    </>
   );
 }
